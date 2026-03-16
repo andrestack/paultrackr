@@ -1,6 +1,6 @@
-Current Phase: Phase 1 COMPLETE
+Current Phase: Phase 2 COMPLETE
 
-Done:
+## Phase 1 Summary (Complete):
 ✅ Created root AGENTS.md with project conventions
 ✅ Created progress.txt and tests.json tracking files
 ✅ Created feature-level AGENTS.md files (ingestion, zones, scheduler, export)
@@ -15,22 +15,39 @@ Done:
 ✅ Updated layout metadata
 ✅ Created sample CSV file for testing (sample-recurring-jobs.csv)
 
-Phase 1 Acceptance Criteria:
-✅ Uploading CSV works without crashing
-✅ Jobs render with correct ID values
-✅ No external APIs involved
-✅ Unit tests for normalizeJob() passing
+## Phase 2 Summary (Complete):
+✅ Implemented makeZoneKey() function with postcode > city > UNKNOWN fallback
+✅ Implemented clusterJobsByZone() function with deterministic sorting
+✅ Created comprehensive unit tests for zone clustering - ALL PASSING (13/13)
+✅ Created Zones panel component with accordion UI
+✅ Added Zones panel to dashboard in two-column layout
+✅ Added shadcn/ui components: Accordion, Collapsible
+✅ Zones show job count, key, city, and sample addresses
 
-Next:
-- Start Phase 2: Zone Clustering (Geographic "Seeing")
-- Implement makeZoneKey() function
-- Implement clusterJobs() function
-- Add Zones panel to dashboard
+## Phase 2 Acceptance Criteria:
+✅ Zones are stable and deterministic (sorted by count desc, then key alphabetically)
+✅ A job always maps to exactly one Zone
+✅ Works with missing address fields (graceful UNKNOWN fallback)
+✅ Unit tests for makeZoneKey() and clusterJobsByZone() passing
 
-Risks/Unknowns:
-- None - Phase 1 complete and tested
+## Test Results:
+- normalizeJob: 5/5 passing
+- validateJob: 2/2 passing
+- makeZoneKey: 5/5 passing
+- clusterJobsByZone: 8/8 passing
+- Total: 20/20 passing
 
-Do-Not-Do List:
+## Next:
+- Start Phase 3: Draft Month Plan Generator
+- Implement generateDraftPlan() function
+- Create 4-week grid UI
+- Add planning rules (zone grouping, load balancing)
+
+## Risks/Unknowns:
+- Need to clarify how to interpret Pattern/Frequency fields for recurring jobs
+- Plan generation needs to be deterministic and testable
+
+## Do-Not-Do List:
 - External routing APIs
 - VRP/TSP solvers
 - Complex authentication

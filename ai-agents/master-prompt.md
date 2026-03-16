@@ -137,7 +137,7 @@ Goal: cluster jobs into Zones by string heuristics: primarily `Address Postcode`
 ---
 
 ## Phase 3 — Draft Month Plan Generator (No Drag-and-Drop yet)
-Goal: generate a 4-week plan draft: assign each job to a day bucket, preferring to keep the same Zone together on the same day.
+Goal: generate a 4-week plan draft: assign each job to a day bucket, preferring to keep the same Zone together on the same day. Ideal scenario: the technician spends a day on the same and adjacent streets.
 
 Important: This is not perfect routing—this is “practical grouping”.
 

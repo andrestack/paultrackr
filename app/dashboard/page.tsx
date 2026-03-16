@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Job } from '@/lib/types';
 import { CsvUpload } from '@/src/features/ingestion/components/csv-upload';
 import { JobList } from '@/src/features/ingestion/components/job-list';
+import { ZonesPanel } from '@/src/features/zones/components/zones-panel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Users } from 'lucide-react';
@@ -27,10 +28,10 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">
-              Paultrackr
+              PoolTrackr Route Optimizer
             </h1>
             <Badge variant="outline" className="text-sm">
-              Phase 1 MVP
+              Phase 2 MVP
             </Badge>
           </div>
         </div>
@@ -90,14 +91,20 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Jobs Table */}
+          {/* Two Column Layout: Zones & Jobs */}
           {jobs.length > 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Job Preview</h2>
-                <Badge variant="secondary">First 20 jobs shown</Badge>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Zones Panel */}
+              <ZonesPanel jobs={jobs} />
+
+              {/* Job Preview */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold font-heading">Job Preview</h2>
+                  <Badge variant="secondary">First 20 jobs</Badge>
+                </div>
+                <JobList jobs={jobs} maxRows={20} />
               </div>
-              <JobList jobs={jobs} maxRows={20} />
             </div>
           )}
 

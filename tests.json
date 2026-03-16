@@ -2,6 +2,8 @@
   "tests": [
     { "name": "normalize_job", "status": "passing" },
     { "name": "validate_job", "status": "passing" },
-    { "name": "parse_csv_headers", "status": "passing" }
+    { "name": "parse_csv_headers", "status": "passing" },
+    { "name": "make_zone_key", "status": "passing" },
+    { "name": "cluster_jobs_by_zone", "status": "passing" }
   ]
 }
