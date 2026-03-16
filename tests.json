@@ -1,0 +1,7 @@
+{
+  "tests": [
+    { "name": "normalize_job", "status": "passing" },
+    { "name": "validate_job", "status": "passing" },
+    { "name": "parse_csv_headers", "status": "passing" }
+  ]
+}

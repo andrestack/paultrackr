@@ -1,0 +1,39 @@
+Current Phase: Phase 1 COMPLETE
+
+Done:
+✅ Created root AGENTS.md with project conventions
+✅ Created progress.txt and tests.json tracking files
+✅ Created feature-level AGENTS.md files (ingestion, zones, scheduler, export)
+✅ Installed papaparse and @types/papaparse
+✅ Created types (JobRaw, Job, Zone, PlannedJob, Plan, PlanState)
+✅ Implemented normalizeJob() function with date parsing and validation
+✅ Created comprehensive unit tests for normalizeJob() - ALL PASSING (7/7)
+✅ Created CSV upload component with drag-and-drop support
+✅ Created job list component with shadcn/ui Table
+✅ Created /dashboard page with stats cards and job preview
+✅ Added shadcn/ui components: Button, Card, Table, Badge
+✅ Updated layout metadata
+✅ Created sample CSV file for testing (sample-recurring-jobs.csv)
+
+Phase 1 Acceptance Criteria:
+✅ Uploading CSV works without crashing
+✅ Jobs render with correct ID values
+✅ No external APIs involved
+✅ Unit tests for normalizeJob() passing
+
+Next:
+- Start Phase 2: Zone Clustering (Geographic "Seeing")
+- Implement makeZoneKey() function
+- Implement clusterJobs() function
+- Add Zones panel to dashboard
+
+Risks/Unknowns:
+- None - Phase 1 complete and tested
+
+Do-Not-Do List:
+- External routing APIs
+- VRP/TSP solvers
+- Complex authentication
+- Database persistence
+- Map visualizations
+- Complex state management
