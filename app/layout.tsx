@@ -14,7 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pooltrackr Route Optimizer",
+  title: "Paultrackr Route Optimizer",
   description: "Keeping the boys' routes tickety-boo",
 };
 

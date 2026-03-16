@@ -180,13 +180,22 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
                           </span>
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="mb-2">
+                          <Badge 
+                            variant={dayJobs.length > 16 ? "destructive" : dayJobs.length > 14 ? "default" : "secondary"}
+                            className="text-xs"
+                          >
+                            {dayJobs.length} jobs
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-2 max-h-[400px] overflow-y-auto">
                           {dayJobs.length === 0 ? (
                             <p className="text-xs text-muted-foreground italic">
                               No jobs
                             </p>
                           ) : (
-                            dayJobs.slice(0, 5).map((job) => (
+                            dayJobs.map((job) => (
                               <div
                                 key={job.id}
                                 className={`text-xs p-2 rounded border ${
@@ -209,12 +218,6 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
                               </div>
                             ))
                           )}
-                          
-                          {dayJobs.length > 5 && (
-                            <p className="text-xs text-muted-foreground text-center">
-                              +{dayJobs.length - 5} more
-                            </p>
-                          )}
                         </div>
                       </div>
                     );
@@ -230,7 +233,7 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">
-                {stats.unplanned} job{stats.unplanned !== 1 ? 's' : ''} couldn't be scheduled
+                {stats.unplanned} job{stats.unplanned !== 1 ? 's' : ''} could not be scheduled
               </span>
             </div>
           </div>

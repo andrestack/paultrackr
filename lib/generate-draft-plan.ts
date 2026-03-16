@@ -3,7 +3,7 @@
  * Groups jobs into zones and assigns them to days over a 4-week period
  */
 
-import { Job, PlannedJob, Plan, Zone } from './types';
+import { Job, PlannedJob, Plan } from './types';
 import { clusterJobsByZone } from './zone-clustering';
 import { formatDateISO, getWeekDates, addDays, parseDateISO } from './date-utils';
 
@@ -73,49 +73,62 @@ export function generateDraftPlan(options: GeneratePlanOptions): Plan {
 
   // Track how many jobs are assigned to each day
   const dayJobCounts = new Map<string, number>();
+  const dayJobs = new Map<string, Job[]>();
   workingDays.forEach(day => {
-    dayJobCounts.set(formatDateISO(day), 0);
+    const dateStr = formatDateISO(day);
+    dayJobCounts.set(dateStr, 0);
+    dayJobs.set(dateStr, []);
   });
 
-  // Find the best day for each zone
-  // Strategy: Try to place each zone on the same day, respecting daily limits
-  let dayIndex = 0;
-
+  // Assign zones to days
+  // Strategy: For each zone, find the day with the most remaining capacity
   for (const zone of zones) {
     if (zone.jobs.length === 0) continue;
 
-    // Check if we can fit this zone on the current day
-    let assignedDay: Date | null = null;
-    let attempts = 0;
-    const maxAttempts = workingDays.length;
-
-    while (attempts < maxAttempts && assignedDay === null) {
-      const candidateDay = workingDays[dayIndex % workingDays.length];
-      const candidateDateStr = formatDateISO(candidateDay);
-      const currentCount = dayJobCounts.get(candidateDateStr) || 0;
-
-      if (currentCount + zone.jobs.length <= maxJobsPerDay) {
-        assignedDay = candidateDay;
-        dayJobCounts.set(candidateDateStr, currentCount + zone.jobs.length);
-      } else {
-        // Try next day
-        dayIndex++;
-        attempts++;
-      }
-    }
-
-    if (assignedDay === null) {
-      // Couldn't find a day with enough capacity
+    // If zone is bigger than max per day, we can't schedule it
+    if (zone.jobs.length > maxJobsPerDay) {
       unplannedJobs.push(...zone.jobs);
       continue;
     }
 
-    // Assign all jobs in the zone to this day
-    const assignedDateStr = formatDateISO(assignedDay);
-    const weekIndex = Math.floor(dayIndex / 5); // 5 working days per week
-    const dayOfWeek = assignedDay.getDay();
+    // Find the best day (one with most space that can fit this zone)
+    let bestDay: Date | null = null;
+    let bestRemainingCapacity = -1;
 
-    for (const job of zone.jobs) {
+    for (const day of workingDays) {
+      const dateStr = formatDateISO(day);
+      const currentCount = dayJobCounts.get(dateStr) || 0;
+      const remainingCapacity = maxJobsPerDay - currentCount;
+
+      if (remainingCapacity >= zone.jobs.length && remainingCapacity > bestRemainingCapacity) {
+        bestDay = day;
+        bestRemainingCapacity = remainingCapacity;
+      }
+    }
+
+    if (bestDay === null) {
+      // No day has enough capacity for this zone
+      unplannedJobs.push(...zone.jobs);
+      continue;
+    }
+
+    // Assign zone to best day
+    const assignedDateStr = formatDateISO(bestDay);
+    const currentCount = dayJobCounts.get(assignedDateStr) || 0;
+    dayJobCounts.set(assignedDateStr, currentCount + zone.jobs.length);
+    
+    const currentJobs = dayJobs.get(assignedDateStr) || [];
+    dayJobs.set(assignedDateStr, [...currentJobs, ...zone.jobs]);
+  }
+
+  // Create planned jobs from day assignments
+  for (const day of workingDays) {
+    const dateStr = formatDateISO(day);
+    const jobsForDay = dayJobs.get(dateStr) || [];
+    const weekIndex = Math.floor(workingDays.indexOf(day) / 5);
+    const dayOfWeek = day.getDay();
+
+    for (const job of jobsForDay) {
       // Determine if this job should appear in this 4-week window
       const interval = parseFrequency(job.pattern, job.frequency);
       const flags: string[] = [];
@@ -124,46 +137,15 @@ export function generateDraftPlan(options: GeneratePlanOptions): Plan {
         flags.push('needs-review');
       }
 
-      // If job has a next date, check if it falls in our window
-      if (job.nextDateParsed) {
-        const nextDateStr = formatDateISO(job.nextDateParsed);
-        const jobInWindow = nextDateStr >= startDate && nextDateStr <= endDate;
-
-        if (jobInWindow) {
-          // Use the job's actual next date
-          plannedJobs.push({
-            ...job,
-            plannedDate: nextDateStr,
-            plannedWeekIndex: Math.floor((parseDateISO(nextDateStr).getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000)),
-            plannedDayIndex: parseDateISO(nextDateStr).getDay(),
-            plannedTechnicianName: job.technicianName || null,
-            flags,
-          });
-        } else {
-          // Schedule it based on zone clustering
-          plannedJobs.push({
-            ...job,
-            plannedDate: assignedDateStr,
-            plannedWeekIndex: weekIndex,
-            plannedDayIndex: dayOfWeek,
-            plannedTechnicianName: job.technicianName || null,
-            flags: [...flags, 'rescheduled'],
-          });
-        }
-      } else {
-        // No next date, schedule based on zone clustering
-        plannedJobs.push({
-          ...job,
-          plannedDate: assignedDateStr,
-          plannedWeekIndex: weekIndex,
-          plannedDayIndex: dayOfWeek,
-          plannedTechnicianName: job.technicianName || null,
-          flags,
-        });
-      }
+      plannedJobs.push({
+        ...job,
+        plannedDate: dateStr,
+        plannedWeekIndex: weekIndex,
+        plannedDayIndex: dayOfWeek,
+        plannedTechnicianName: job.technicianName || null,
+        flags,
+      });
     }
-
-    dayIndex++;
   }
 
   return {

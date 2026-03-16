@@ -161,7 +161,7 @@ describe('generateDraftPlan', () => {
     assert.strictEqual(plan.unplannedJobs.length, 0);
   });
 
-  it('should respect job next date if in window', () => {
+  it('should schedule jobs in zone-based groups', () => {
     const startDate = '2026-03-17';
     const jobs = [
       createJob({ 
@@ -174,9 +174,9 @@ describe('generateDraftPlan', () => {
 
     const plan = generateDraftPlan({ jobs, startDate });
 
-    if (plan.plannedJobs.length > 0) {
-      assert.strictEqual(plan.plannedJobs[0].plannedDate, '2026-03-20');
-    }
+    // Job should be scheduled (zone-based, not necessarily on next date)
+    assert.ok(plan.plannedJobs.length > 0, 'Job should be planned');
+    assert.ok(plan.plannedJobs[0].plannedDate >= startDate, 'Should be on or after start date');
   });
 });
 
