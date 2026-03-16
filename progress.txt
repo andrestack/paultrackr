@@ -1,4 +1,4 @@
-Current Phase: Phase 2 COMPLETE
+Current Phase: Phase 3 COMPLETE
 
 ## Phase 1 Summary (Complete):
 ✅ Created root AGENTS.md with project conventions
@@ -24,28 +24,45 @@ Current Phase: Phase 2 COMPLETE
 ✅ Added shadcn/ui components: Accordion, Collapsible
 ✅ Zones show job count, key, city, and sample addresses
 
-## Phase 2 Acceptance Criteria:
-✅ Zones are stable and deterministic (sorted by count desc, then key alphabetically)
-✅ A job always maps to exactly one Zone
-✅ Works with missing address fields (graceful UNKNOWN fallback)
-✅ Unit tests for makeZoneKey() and clusterJobsByZone() passing
+## Phase 3 Summary (Complete):
+✅ Implemented generateDraftPlan() pure function with zone-based grouping
+✅ Created date utilities (formatDateISO, parseDateISO, addDays, getWeekDates, etc.)
+✅ Implemented moveJobInPlan() for plan state updates
+✅ Created comprehensive unit tests for plan generation - ALL PASSING (12/12)
+✅ Created SchedulePanel component with 4-week tabbed view
+✅ Jobs grouped by week and displayed in Mon-Fri grid
+✅ Shows job counts, unplanned jobs alert, and needs-review flags
+✅ Added date picker for selecting start date
+✅ Added Reset button to regenerate plan
+✅ Added shadcn/ui component: Tabs
+✅ Schedule panel integrated into dashboard
+
+## Phase 3 Acceptance Criteria:
+✅ Plan renders and contains most jobs (some may be unplanned with flags)
+✅ Plan generation is deterministic for same inputs
+✅ Jobs assigned within window
+✅ Flags set when frequency unknown
+✅ Unit tests for generateDraftPlan() and moveJobInPlan() passing
 
 ## Test Results:
 - normalizeJob: 5/5 passing
 - validateJob: 2/2 passing
 - makeZoneKey: 5/5 passing
 - clusterJobsByZone: 8/8 passing
-- Total: 20/20 passing
+- generateDraftPlan: 9/9 passing
+- moveJobInPlan: 3/3 passing
+- Total: 32/32 passing
 
 ## Next:
-- Start Phase 3: Draft Month Plan Generator
-- Implement generateDraftPlan() function
-- Create 4-week grid UI
-- Add planning rules (zone grouping, load balancing)
+- Start Phase 4: Drag-and-Drop Scheduler
+- Install dnd-kit library
+- Implement drag-and-drop between day cells
+- Add undo/reset functionality
+- Prepare for Phase 5 export
 
 ## Risks/Unknowns:
-- Need to clarify how to interpret Pattern/Frequency fields for recurring jobs
-- Plan generation needs to be deterministic and testable
+- None - Phase 3 complete and tested
+- dnd-kit integration should be straightforward
 
 ## Do-Not-Do List:
 - External routing APIs

@@ -5,6 +5,7 @@ import { Job } from '@/lib/types';
 import { CsvUpload } from '@/src/features/ingestion/components/csv-upload';
 import { JobList } from '@/src/features/ingestion/components/job-list';
 import { ZonesPanel } from '@/src/features/zones/components/zones-panel';
+import { SchedulePanel } from '@/src/features/scheduler/components/schedule-panel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Users } from 'lucide-react';
@@ -31,7 +32,7 @@ export default function DashboardPage() {
               PoolTrackr Route Optimizer
             </h1>
             <Badge variant="outline" className="text-sm">
-              Phase 2 MVP
+              Phase 3 MVP
             </Badge>
           </div>
         </div>
@@ -90,6 +91,9 @@ export default function DashboardPage() {
               </Card>
             </div>
           )}
+
+          {/* Schedule Panel */}
+          {jobs.length > 0 && <SchedulePanel jobs={jobs} />}
 
           {/* Two Column Layout: Zones & Jobs */}
           {jobs.length > 0 && (

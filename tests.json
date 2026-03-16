@@ -4,6 +4,8 @@
     { "name": "validate_job", "status": "passing" },
     { "name": "parse_csv_headers", "status": "passing" },
     { "name": "make_zone_key", "status": "passing" },
-    { "name": "cluster_jobs_by_zone", "status": "passing" }
+    { "name": "cluster_jobs_by_zone", "status": "passing" },
+    { "name": "generate_draft_plan", "status": "passing" },
+    { "name": "move_job_in_plan", "status": "passing" }
   ]
 }
