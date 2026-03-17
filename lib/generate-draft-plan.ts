@@ -57,63 +57,91 @@ export function generateDraftPlan(options: GeneratePlanOptions): Plan {
   for (let w = 0; w < weeks; w++) {
     const monday = addDays(start, w * 7);
     const weekDates = getWeekDates(monday);
-    workingDays.push(...weekDates.slice(1, 6)); // Mon-Fri only
+    workingDays.push(...weekDates.slice(0, 5)); // Mon-Fri (indices 0-4)
   }
 
-  // Assign one zone per week
-  for (let weekIndex = 0; weekIndex < weeks && weekIndex < sortedZones.length; weekIndex++) {
-    const zone = sortedZones[weekIndex];
-    const weekDays = workingDays.slice(weekIndex * 5, (weekIndex + 1) * 5);
-    
-    // Calculate how many jobs per day for this zone
-    const totalZoneJobs = zone.jobs.length;
-    const maxCapacity = maxJobsPerDay * 5; // 5 days
-    
-    if (totalZoneJobs > maxCapacity) {
-      // Zone too big - schedule what fits, mark rest unplanned
-      const jobsToSchedule = zone.jobs.slice(0, maxCapacity);
-      const jobsUnplanned = zone.jobs.slice(maxCapacity);
-      
-      // Distribute jobsToSchedule across 5 days
-      jobsToSchedule.forEach((job, idx) => {
-        const dayIndex = idx % 5;
-        const day = weekDays[dayIndex];
-        const interval = parseFrequency(job.pattern, job.frequency);
-        
-        plannedJobs.push({
-          ...job,
-          plannedDate: formatDateISO(day),
-          plannedWeekIndex: weekIndex,
-          plannedDayIndex: day.getDay(),
-          plannedTechnicianName: job.technicianName || null,
-          flags: interval === null ? ['needs-review'] : [],
-        });
-      });
-      
-      unplannedJobs.push(...jobsUnplanned);
-    } else {
-      // Zone fits - distribute evenly across Mon-Fri
-      zone.jobs.forEach((job, idx) => {
-        const dayIndex = idx % 5;
-        const day = weekDays[dayIndex];
-        const interval = parseFrequency(job.pattern, job.frequency);
-        
-        plannedJobs.push({
-          ...job,
-          plannedDate: formatDateISO(day),
-          plannedWeekIndex: weekIndex,
-          plannedDayIndex: day.getDay(),
-          plannedTechnicianName: job.technicianName || null,
-          flags: interval === null ? ['needs-review'] : [],
-        });
-      });
+  // Track daily job counts
+  const dayJobCounts = new Map<string, number>();
+  workingDays.forEach(day => {
+    dayJobCounts.set(formatDateISO(day), 0);
+  });
+
+  // Assign primary zones to weeks first (one zone per week)
+  const primaryZoneAssignments: Map<number, string> = new Map(); // weekIndex -> zoneKey
+  sortedZones.slice(0, weeks).forEach((zone, index) => {
+    primaryZoneAssignments.set(index, zone.key);
+  });
+
+  // Distribute ALL jobs from ALL zones across all days
+  // Priority: Primary zone jobs go to their assigned week first
+  // Remaining capacity filled with other zone jobs
+  
+  for (const zone of sortedZones) {
+    // Find which week this zone is primarily assigned to (if any)
+    let primaryWeek: number | null = null;
+    for (const [weekIdx, zoneKey] of primaryZoneAssignments) {
+      if (zoneKey === zone.key) {
+        primaryWeek = weekIdx;
+        break;
+      }
     }
-  }
 
-  // Handle extra zones (if more than 4 zones)
-  if (sortedZones.length > weeks) {
-    for (let i = weeks; i < sortedZones.length; i++) {
-      unplannedJobs.push(...sortedZones[i].jobs);
+    // Distribute this zone's jobs
+    for (const job of zone.jobs) {
+      let assigned = false;
+      
+      // Try to assign to primary week first (if exists)
+      if (primaryWeek !== null) {
+        const weekDays = workingDays.slice(primaryWeek * 5, (primaryWeek + 1) * 5);
+        for (const day of weekDays) {
+          const dateStr = formatDateISO(day);
+          const currentCount = dayJobCounts.get(dateStr) || 0;
+          
+          if (currentCount < maxJobsPerDay) {
+            const interval = parseFrequency(job.pattern, job.frequency);
+            plannedJobs.push({
+              ...job,
+              plannedDate: dateStr,
+              plannedWeekIndex: primaryWeek,
+              plannedDayIndex: day.getDay(),
+              plannedTechnicianName: job.technicianName || null,
+              flags: interval === null ? ['needs-review'] : [],
+            });
+            dayJobCounts.set(dateStr, currentCount + 1);
+            assigned = true;
+            break;
+          }
+        }
+      }
+      
+      // If not assigned to primary week, find any available day
+      if (!assigned) {
+        for (const day of workingDays) {
+          const dateStr = formatDateISO(day);
+          const currentCount = dayJobCounts.get(dateStr) || 0;
+          
+          if (currentCount < maxJobsPerDay) {
+            const weekIndex = Math.floor(workingDays.indexOf(day) / 5);
+            const interval = parseFrequency(job.pattern, job.frequency);
+            plannedJobs.push({
+              ...job,
+              plannedDate: dateStr,
+              plannedWeekIndex: weekIndex,
+              plannedDayIndex: day.getDay(),
+              plannedTechnicianName: job.technicianName || null,
+              flags: interval === null ? ['needs-review'] : [],
+            });
+            dayJobCounts.set(dateStr, currentCount + 1);
+            assigned = true;
+            break;
+          }
+        }
+      }
+      
+      // If still not assigned, mark as unplanned
+      if (!assigned) {
+        unplannedJobs.push(job);
+      }
     }
   }
 
