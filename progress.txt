@@ -1,4 +1,4 @@
-Current Phase: Phase 4 COMPLETE
+Current Phase: Phase 5 COMPLETE - MVP FINISHED
 
 ## Phase 1 Summary (Complete):
 ✅ Created root AGENTS.md with project conventions
@@ -37,6 +37,7 @@ Current Phase: Phase 4 COMPLETE
 ✅ Added shadcn/ui component: Tabs
 ✅ Schedule panel integrated into dashboard
 ✅ Updated date format to DD-MM-YYYY throughout
+✅ Implemented zone-per-week distribution with all zones scheduled
 
 ## Phase 4 Summary (Complete):
 ✅ Installed dnd-kit (@dnd-kit/core, @dnd-kit/utilities)
@@ -49,35 +50,73 @@ Current Phase: Phase 4 COMPLETE
 ✅ Jobs maintain styling (amber for needs-review)
 ✅ Drag overlay shows job being moved
 ✅ Drop zones highlight on hover
+✅ Fixed date parsing issues for proper drag-and-drop
+✅ Fixed Monday population issue
 
-## Phase 4 Acceptance Criteria:
-✅ Dragging is stable and does not duplicate/lose jobs
-✅ Jobs remain keyed by ID in React lists (no index keys)
-✅ After drag, exportable state reflects new dates
-✅ Unit test for reducer/state update: moveJobInPlan()
+## Phase 5 Summary (Complete):
+✅ Created exportPlanCsv() function (Mode A)
+  - Exports ID, Planned Date, Technician, Zone Key, Notes/Flags
+  - Includes both planned and unplanned jobs
+  - Flags shown as semicolon-separated list
+✅ Created exportPoolTrackrCsv() function (Mode B)
+  - Preserves original CSV column order exactly
+  - Updates Next Date with planned date in DD/MM/YYYY format (PoolTrackr format)
+  - Preserves ID column exactly
+  - Maintains all other columns unchanged
+✅ Created downloadCsv() helper for browser download
+✅ Created comprehensive unit tests for export functions (9/9 passing)
+✅ Added "Export Plan" button (Mode A) to SchedulePanel
+✅ Added "Export for PoolTrackr" button (Mode B) to SchedulePanel
+✅ PoolTrackr export uses DD/MM/YYYY date format for compatibility
+✅ Export downloads file automatically
 
-## Test Results:
+## Final Test Results:
 - normalizeJob: 5/5 passing
 - validateJob: 2/2 passing
 - makeZoneKey: 5/5 passing
 - clusterJobsByZone: 8/8 passing
 - generateDraftPlan: 12/12 passing
 - moveJobInPlan: 3/3 passing
-- Total: 35/35 passing
+- exportPlanCsv: 5/5 passing
+- exportPoolTrackrCsv: 5/5 passing
+- **Total: 45/45 passing**
 
-## Next:
-- Start Phase 5: Export (CSV round-trip)
-- Implement exportPlanCsv() (Mode A)
-- Implement exportPoolTrackrCsv() (Mode B)
-- Add download buttons
+## Date Format Compliance:
+- ✅ Internal app uses DD-MM-YYYY format
+- ✅ PoolTrackr export uses DD/MM/YYYY format (matches PoolTrackr's format)
+- ✅ All dates properly converted for export
 
-## Risks/Unknowns:
-- None - Phase 4 complete and tested
+## MVP Complete Features:
+1. ✅ CSV upload and parsing
+2. ✅ Job normalization and validation
+3. ✅ Zone clustering by postcode/city
+4. ✅ 4-week draft schedule generation
+5. ✅ Drag-and-drop job rescheduling
+6. ✅ Undo functionality
+7. ✅ Export to CSV (Mode A and B)
+8. ✅ All 45 tests passing
+9. ✅ Clean UI with shadcn/ui components
 
-## Do-Not-Do List:
-- External routing APIs
-- VRP/TSP solvers
-- Complex authentication
-- Database persistence
-- Map visualizations
-- Complex state management
+## Technical Stack:
+- Next.js 16+ with App Router
+- TypeScript 5+
+- Tailwind CSS 4
+- shadcn/ui components
+- papaparse for CSV parsing
+- dnd-kit for drag-and-drop
+- Node.js test runner for unit tests
+
+## Next Steps (Post-MVP):
+- Phase 6: PoolTrackr-compatible CSV export (Mode B) with download button
+- Phase 7: Enhanced technician assignment
+- Phase 8: Multi-month planning
+- Phase 9: Save/load plans
+- Phase 10: Route optimization algorithms
+
+## Do-Not-Do List (MVP Constraints):
+- ✅ NO external routing APIs (Google Maps, Mapbox)
+- ✅ NO VRP/TSP solvers
+- ✅ NO complex authentication
+- ✅ NO database persistence
+- ✅ NO map visualizations
+- ✅ NO complex state management

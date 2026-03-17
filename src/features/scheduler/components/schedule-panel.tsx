@@ -3,12 +3,13 @@
 import { useMemo, useState } from 'react';
 import { Job, Plan, PlannedJob } from '@/lib/types';
 import { generateDraftPlan, moveJobInPlan } from '@/lib/generate-draft-plan';
+import { exportPlanCsv, exportPoolTrackrCsv, downloadCsv } from '@/lib/export-csv';
 import { getNextMonday, formatDateISO, formatDateShort } from '@/lib/date-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, AlertCircle, RotateCcw, Sparkles, Undo2 } from 'lucide-react';
+import { Calendar, AlertCircle, RotateCcw, Sparkles, Undo2, Download } from 'lucide-react';
 import {
   DndContext,
   DragOverlay,
@@ -349,6 +350,32 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
             <Button variant="outline" size="sm" onClick={handleResetPlan}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                if (plan) {
+                  const csv = exportPlanCsv(plan);
+                  downloadCsv(csv, 'schedule-plan.csv');
+                }
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Plan
+            </Button>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={() => {
+                if (plan && jobs.length > 0) {
+                  const csv = exportPoolTrackrCsv(jobs, plan);
+                  downloadCsv(csv, 'pooltrackr-update.csv');
+                }
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export for PoolTrackr
             </Button>
           </div>
         </div>
