@@ -6,6 +6,9 @@
     { "name": "make_zone_key", "status": "passing" },
     { "name": "cluster_jobs_by_zone", "status": "passing" },
     { "name": "generate_draft_plan", "status": "passing" },
-    { "name": "move_job_in_plan", "status": "passing" }
+    { "name": "move_job_in_plan", "status": "passing" },
+    { "name": "dnd_drag_end", "status": "not_started" },
+    { "name": "export_plan_csv", "status": "not_started" },
+    { "name": "export_pooltrackr_csv", "status": "not_started" }
   ]
 }

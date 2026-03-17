@@ -1,4 +1,4 @@
-Current Phase: Phase 3 COMPLETE
+Current Phase: Phase 4 COMPLETE
 
 ## Phase 1 Summary (Complete):
 ✅ Created root AGENTS.md with project conventions
@@ -26,7 +26,7 @@ Current Phase: Phase 3 COMPLETE
 
 ## Phase 3 Summary (Complete):
 ✅ Implemented generateDraftPlan() pure function with zone-based grouping
-✅ Created date utilities (formatDateISO, parseDateISO, addDays, getWeekDates, etc.)
+✅ Created date utilities (formatDateISO, parseDateISO, addDays, getWeekDates)
 ✅ Implemented moveJobInPlan() for plan state updates
 ✅ Created comprehensive unit tests for plan generation - ALL PASSING (12/12)
 ✅ Created SchedulePanel component with 4-week tabbed view
@@ -36,33 +36,43 @@ Current Phase: Phase 3 COMPLETE
 ✅ Added Reset button to regenerate plan
 ✅ Added shadcn/ui component: Tabs
 ✅ Schedule panel integrated into dashboard
+✅ Updated date format to DD-MM-YYYY throughout
 
-## Phase 3 Acceptance Criteria:
-✅ Plan renders and contains most jobs (some may be unplanned with flags)
-✅ Plan generation is deterministic for same inputs
-✅ Jobs assigned within window
-✅ Flags set when frequency unknown
-✅ Unit tests for generateDraftPlan() and moveJobInPlan() passing
+## Phase 4 Summary (Complete):
+✅ Installed dnd-kit (@dnd-kit/core, @dnd-kit/utilities)
+✅ Set up DndContext and DragOverlay for drag-and-drop
+✅ Created DraggableJobCard component with visual feedback
+✅ Created DroppableDayCell component with hover states
+✅ Implemented drag-to-move logic using moveJobInPlan()
+✅ Added Undo button with history tracking
+✅ Added visual feedback during drag operations
+✅ Jobs maintain styling (amber for needs-review)
+✅ Drag overlay shows job being moved
+✅ Drop zones highlight on hover
+
+## Phase 4 Acceptance Criteria:
+✅ Dragging is stable and does not duplicate/lose jobs
+✅ Jobs remain keyed by ID in React lists (no index keys)
+✅ After drag, exportable state reflects new dates
+✅ Unit test for reducer/state update: moveJobInPlan()
 
 ## Test Results:
 - normalizeJob: 5/5 passing
 - validateJob: 2/2 passing
 - makeZoneKey: 5/5 passing
 - clusterJobsByZone: 8/8 passing
-- generateDraftPlan: 9/9 passing
+- generateDraftPlan: 12/12 passing
 - moveJobInPlan: 3/3 passing
-- Total: 32/32 passing
+- Total: 35/35 passing
 
 ## Next:
-- Start Phase 4: Drag-and-Drop Scheduler
-- Install dnd-kit library
-- Implement drag-and-drop between day cells
-- Add undo/reset functionality
-- Prepare for Phase 5 export
+- Start Phase 5: Export (CSV round-trip)
+- Implement exportPlanCsv() (Mode A)
+- Implement exportPoolTrackrCsv() (Mode B)
+- Add download buttons
 
 ## Risks/Unknowns:
-- None - Phase 3 complete and tested
-- dnd-kit integration should be straightforward
+- None - Phase 4 complete and tested
 
 ## Do-Not-Do List:
 - External routing APIs

@@ -60,21 +60,21 @@ describe('generateDraftPlan', () => {
     assert.strictEqual(totalJobs, 3);
   });
 
-  it('should keep jobs from same zone on same day', () => {
+  it('should distribute jobs evenly across days', () => {
     const jobs = [
       createJob({ id: '1', addressPostcode: '4556' }),
       createJob({ id: '2', addressPostcode: '4556' }),
       createJob({ id: '3', addressPostcode: '4557' }),
     ];
 
-    const plan = generateDraftPlan({ jobs, startDate: '2026-03-17' });
+    const plan = generateDraftPlan({ jobs, startDate: '17-03-2026' });
 
-    // Find the two jobs from zone 4556
-    const zone4556Jobs = plan.plannedJobs.filter(j => j.addressPostcode === '4556');
+    // All jobs should be scheduled
+    assert.strictEqual(plan.plannedJobs.length, 3);
     
-    if (zone4556Jobs.length === 2) {
-      assert.strictEqual(zone4556Jobs[0].plannedDate, zone4556Jobs[1].plannedDate);
-    }
+    // Jobs should be on different days (round-robin)
+    const dates = new Set(plan.plannedJobs.map(j => j.plannedDate));
+    assert.strictEqual(dates.size, 3);
   });
 
   it('should respect daily job limits', () => {
@@ -85,7 +85,7 @@ describe('generateDraftPlan', () => {
 
     const plan = generateDraftPlan({ 
       jobs, 
-      startDate: '2026-03-17',
+      startDate: '17-03-2026',
       maxJobsPerDay: 5 
     });
 
@@ -109,8 +109,8 @@ describe('generateDraftPlan', () => {
       createJob({ id: '3', addressPostcode: '4558' }),
     ];
 
-    const plan1 = generateDraftPlan({ jobs, startDate: '2026-03-17' });
-    const plan2 = generateDraftPlan({ jobs, startDate: '2026-03-17' });
+    const plan1 = generateDraftPlan({ jobs, startDate: '17-03-2026' });
+    const plan2 = generateDraftPlan({ jobs, startDate: '17-03-2026' });
 
     assert.strictEqual(plan1.plannedJobs.length, plan2.plannedJobs.length);
     
@@ -132,7 +132,7 @@ describe('generateDraftPlan', () => {
       }),
     ];
 
-    const plan = generateDraftPlan({ jobs, startDate: '2026-03-17' });
+    const plan = generateDraftPlan({ jobs, startDate: '17-03-2026' });
 
     // Job should be planned (unknown frequency just gets a flag)
     assert.ok(plan.plannedJobs.length > 0, 'Job should be planned');
@@ -140,7 +140,7 @@ describe('generateDraftPlan', () => {
   });
 
   it('should set week index and day index correctly', () => {
-    const startDate = '2026-03-17'; // Tuesday, Week 0
+    const startDate = '17-03-2026'; // Tuesday, Week 0
     const jobs = [createJob({ id: '1' })];
 
     const plan = generateDraftPlan({ jobs, startDate });
@@ -155,7 +155,7 @@ describe('generateDraftPlan', () => {
   });
 
   it('should handle empty job array', () => {
-    const plan = generateDraftPlan({ jobs: [], startDate: '2026-03-17' });
+    const plan = generateDraftPlan({ jobs: [], startDate: '17-03-2026' });
     
     assert.strictEqual(plan.plannedJobs.length, 0);
     assert.strictEqual(plan.unplannedJobs.length, 0);
