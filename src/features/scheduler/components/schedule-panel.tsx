@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Job, Plan, PlannedJob } from '@/lib/types';
 import { generateDraftPlan } from '@/lib/generate-draft-plan';
-import { getNextMonday, formatDateISO, getFullDayName } from '@/lib/date-utils';
+import { getNextMonday, formatDateISO, formatDateShort } from '@/lib/date-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -71,7 +71,7 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
       for (let day = 0; day < 5; day++) {
         const date = new Date(weekStart);
         date.setDate(weekStart.getDate() + day);
-        weekDays.push(formatDateISO(date));
+        weekDays.push(formatDateShort(date)); // Use DD-MM format
       }
       dates.push(weekDays);
     }
@@ -176,7 +176,7 @@ export function SchedulePanel({ jobs }: SchedulePanelProps) {
                         <div className="text-sm font-medium mb-2">
                           {day}
                           <span className="text-muted-foreground ml-2 text-xs">
-                            {dateStr.slice(5)}
+                            {dateStr}
                           </span>
                         </div>
                         

@@ -80,45 +80,64 @@ export function generateDraftPlan(options: GeneratePlanOptions): Plan {
     dayJobs.set(dateStr, []);
   });
 
-  // Assign zones to days
-  // Strategy: For each zone, find the day with the most remaining capacity
-  for (const zone of zones) {
-    if (zone.jobs.length === 0) continue;
-
-    // If zone is bigger than max per day, we can't schedule it
-    if (zone.jobs.length > maxJobsPerDay) {
-      unplannedJobs.push(...zone.jobs);
-      continue;
+  // Assign jobs to days
+  // Strategy: Fill each day greedily, prioritizing keeping zone jobs together
+  // but splitting large zones if needed
+  
+  // First, sort all jobs by zone key to keep them somewhat together
+  const allJobsWithZoneKey = jobs.map(job => ({
+    job,
+    zoneKey: job.addressPostcode || job.addressCity || 'UNKNOWN'
+  }));
+  
+  // Group by zone
+  const jobsByZone = new Map<string, Job[]>();
+  for (const { job, zoneKey } of allJobsWithZoneKey) {
+    if (!jobsByZone.has(zoneKey)) {
+      jobsByZone.set(zoneKey, []);
     }
-
-    // Find the best day (one with most space that can fit this zone)
-    let bestDay: Date | null = null;
-    let bestRemainingCapacity = -1;
-
-    for (const day of workingDays) {
-      const dateStr = formatDateISO(day);
-      const currentCount = dayJobCounts.get(dateStr) || 0;
-      const remainingCapacity = maxJobsPerDay - currentCount;
-
-      if (remainingCapacity >= zone.jobs.length && remainingCapacity > bestRemainingCapacity) {
-        bestDay = day;
-        bestRemainingCapacity = remainingCapacity;
-      }
-    }
-
-    if (bestDay === null) {
-      // No day has enough capacity for this zone
-      unplannedJobs.push(...zone.jobs);
-      continue;
-    }
-
-    // Assign zone to best day
-    const assignedDateStr = formatDateISO(bestDay);
-    const currentCount = dayJobCounts.get(assignedDateStr) || 0;
-    dayJobCounts.set(assignedDateStr, currentCount + zone.jobs.length);
+    jobsByZone.get(zoneKey)!.push(job);
+  }
+  
+  // For each zone, try to place all jobs on the same day
+  // If zone is too big, split across days
+  for (const [zoneKey, zoneJobs] of jobsByZone) {
+    let remainingJobs = [...zoneJobs];
     
-    const currentJobs = dayJobs.get(assignedDateStr) || [];
-    dayJobs.set(assignedDateStr, [...currentJobs, ...zone.jobs]);
+    while (remainingJobs.length > 0) {
+      // Find the day with the most space
+      let bestDay: Date | null = null;
+      let bestRemainingCapacity = 0;
+
+      for (const day of workingDays) {
+        const dateStr = formatDateISO(day);
+        const currentCount = dayJobCounts.get(dateStr) || 0;
+        const remainingCapacity = maxJobsPerDay - currentCount;
+
+        if (remainingCapacity > bestRemainingCapacity) {
+          bestDay = day;
+          bestRemainingCapacity = remainingCapacity;
+        }
+      }
+
+      if (bestDay === null || bestRemainingCapacity === 0) {
+        // No more capacity, mark remaining as unplanned
+        unplannedJobs.push(...remainingJobs);
+        break;
+      }
+
+      // Take as many jobs as will fit
+      const jobsToPlace = remainingJobs.slice(0, bestRemainingCapacity);
+      remainingJobs = remainingJobs.slice(bestRemainingCapacity);
+      
+      // Assign to best day
+      const assignedDateStr = formatDateISO(bestDay);
+      const currentCount = dayJobCounts.get(assignedDateStr) || 0;
+      dayJobCounts.set(assignedDateStr, currentCount + jobsToPlace.length);
+      
+      const currentJobs = dayJobs.get(assignedDateStr) || [];
+      dayJobs.set(assignedDateStr, [...currentJobs, ...jobsToPlace]);
+    }
   }
 
   // Create planned jobs from day assignments

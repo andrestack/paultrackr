@@ -1,6 +1,7 @@
 'use client';
 
 import { Job } from '@/lib/types';
+import { formatDateISO } from '@/lib/date-utils';
 import {
   Table,
   TableBody,
@@ -56,7 +57,7 @@ export function JobList({ jobs, maxRows = 20 }: JobListProps) {
               <TableCell className="text-sm">
                 {job.nextDateParsed ? (
                   <span className="text-green-600 dark:text-green-400">
-                    {job.nextDateParsed.toISOString().split('T')[0]}
+                    {formatDateISO(job.nextDateParsed)}
                   </span>
                 ) : (
                   <span className="text-muted-foreground">{job.nextDateRaw || '-'}</span>

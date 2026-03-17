@@ -3,17 +3,37 @@
  */
 
 /**
- * Format a Date object as YYYY-MM-DD string
+ * Format a Date object as DD-MM-YYYY string
  */
 export function formatDateISO(date: Date): string {
-  return date.toISOString().split('T')[0];
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
 }
 
 /**
- * Parse a YYYY-MM-DD string into a Date object
+ * Format a Date object as DD-MM string (short format)
+ */
+export function formatDateShort(date: Date): string {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  return `${day}-${month}`;
+}
+
+/**
+ * Parse a DD-MM-YYYY string into a Date object
  */
 export function parseDateISO(dateStr: string): Date {
-  return new Date(dateStr + 'T00:00:00');
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1; // 0-indexed
+    const year = parseInt(parts[2]);
+    return new Date(year, month, day);
+  }
+  // Fallback to native parsing
+  return new Date(dateStr);
 }
 
 /**
